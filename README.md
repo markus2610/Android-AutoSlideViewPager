@@ -1,6 +1,9 @@
 Automatic Sliding ViewPager
 ==========================
 
+## Sample Application
+![Screenshot](https://github.com/Caij/Android-AutoSlideViewPager/raw/master/sample.gif)
+
 ## Usage
 - include this library, use
 
