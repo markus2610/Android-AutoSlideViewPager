@@ -43,8 +43,6 @@ public abstract class AutoSlideViewPageAdapter extends PagerAdapter implements I
 	@Override
 	public Object instantiateItem(ViewGroup container, int position) {
 		position = position % getPageCount();
-		ImageView i = new ImageView(container.getContext());
-		i.setBackgroundResource(R.drawable.ic_launcher);
 		View view = instantiatePageItem(position);
 		container.addView(view);
 		return view;
