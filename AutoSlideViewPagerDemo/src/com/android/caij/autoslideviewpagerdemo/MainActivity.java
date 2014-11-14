@@ -41,6 +41,12 @@ public class MainActivity extends Activity {
 		viewPager.stopSlide();
 	}
 	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		viewPager.startSlide();
+	}
+	
 	private class MyAdapter extends AutoSlideViewPageAdapter{
 
 		@Override
