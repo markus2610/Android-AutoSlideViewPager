@@ -21,6 +21,7 @@ Automatic Sliding ViewPager
 - `setStopScrollWhenTouch(boolean)` set whether stop auto slide when touching, default is true.
 - `setShowTitle(boolean) ` Whether the display page title, default is true.
 - `setShowPoint(boolean)   ` Whether the display point images, default is true.
+- `setScrollDurationFactor(double) ` set the factor by which the multiple of duration of sliding animation will change, default 1.0.
 
 ## Contact Me
 
