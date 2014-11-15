@@ -1,5 +1,7 @@
 package com.android.caij.autoslideviewpager;
 
+import java.lang.reflect.Field;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
@@ -9,6 +11,7 @@ import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -33,6 +36,7 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 	
 	private static final int WHAT = 1;
 	private static final int INTERVAL_TIME = 2000;
+	private static final double SCROOL_FACTOR = 1.0;
 	
 	private Context      	context;
 	private ViewPager    	mViewPager;
@@ -58,9 +62,13 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 	private boolean 		isShowTitle = true;
 	
 	/**previous page index*/
-	private Integer				mPreviousItem = null;
+	private Integer			mPreviousItem = null;
 	
 	private AutoSlideViewPageAdapter mAdapter;
+	private CustomDurationScroller scroller;
+	
+	private double 			swipeScrollFactor = SCROOL_FACTOR;
+	private double 			autoScrollFactor = SCROOL_FACTOR;
 	
 	public AutoSlideViewPager(Context context) {
 		super(context);
@@ -83,6 +91,7 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		mSelectPointImageResid = R.drawable.point_select;
 		
 		mViewPager.setOnPageChangeListener(this);
+		setViewPagerScroller();
 	}
 	
 	public void setAdapter(AutoSlideViewPageAdapter adapter) {
@@ -138,8 +147,8 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		if (mHandler == null) {
 			mHandler = new MHandler();
 		}
-		mHandler.removeMessages(WHAT);
-		mHandler.sendEmptyMessageDelayed(WHAT, mIntervalTime);
+		removeMessages(WHAT);
+		sendMessage(WHAT, (long) (mIntervalTime + scroller.getDuration()/ autoScrollFactor * swipeScrollFactor));
 	}
 	
 	/**
@@ -149,8 +158,16 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 	public void stopSlide() {
 		isAuto = false;
 		if (mHandler != null) {
-			mHandler.removeMessages(WHAT);
+			removeMessages(WHAT);
 		}
+	}
+	
+	private void sendMessage(int what, long delayMillis) {
+		mHandler.sendEmptyMessageDelayed(what, delayMillis);
+	}
+	
+	private void removeMessages(int what) {
+		mHandler.removeMessages(what);
 	}
 	
 	@Override
@@ -176,14 +193,16 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		this.stopScrollWhenTouch = stopScrollWhenTouch;
 	}
 
-	public void setCurrentItem(int item) {
-		mViewPager.setCurrentItem(item);
+	public void setCurrentItem(int item, boolean smoothScroll) {
+		item = mViewPager.getCurrentItem() - getCurrentItem() + item;
+		mViewPager.setCurrentItem(item, smoothScroll);
+		stopSlide();
+		startSlide();
 	}
 	
 	public int getCurrentItem() {
 		return mViewPager.getCurrentItem() % mAdapter.getPageCount();
 	}
-	
 	
 	/**
 	 * Whether the display point images
@@ -196,6 +215,39 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 	public void setShowTitle(boolean isShowTitle) {
 		this.isShowTitle = isShowTitle;
 	}
+	
+	/**
+     * set ViewPager scroller to change animation duration when sliding
+     */
+    private void setViewPagerScroller() {
+        try {
+            Field scrollerField = ViewPager.class.getDeclaredField("mScroller");
+            scrollerField.setAccessible(true);
+            Field interpolatorField = ViewPager.class.getDeclaredField("sInterpolator");
+            interpolatorField.setAccessible(true);
+
+            scroller = new CustomDurationScroller(getContext(), (Interpolator)interpolatorField.get(null));
+            scrollerField.set(mViewPager, scroller);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * set the factor by which the duration of sliding animation will change while swiping
+     */
+    public void setSwipeScrollDurationFactor(double scrollFactor) {
+    	scroller.setScrollDurationFactor(scrollFactor);
+        swipeScrollFactor = scrollFactor;
+    }
+
+    /**
+     * set the factor by which the duration of sliding animation will change while auto scrolling
+     */
+    public void setAutoScrollDurationFactor(double scrollFactor) {
+        autoScrollFactor = scrollFactor;
+    }
+	
 
 	@Override
 	public void onPageScrollStateChanged(int state) {
@@ -230,8 +282,10 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		@Override
 		public void handleMessage(Message msg) {
 			if (isAuto) {
-				setCurrentItem(mViewPager.getCurrentItem() + 1);
-				mHandler.sendEmptyMessageDelayed(WHAT, mIntervalTime);
+				scroller.setScrollDurationFactor(autoScrollFactor);
+				mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
+				scroller.setScrollDurationFactor(swipeScrollFactor);
+				AutoSlideViewPager.this.sendMessage(WHAT, mIntervalTime + scroller.getDuration());
 			}
 		}
 	}

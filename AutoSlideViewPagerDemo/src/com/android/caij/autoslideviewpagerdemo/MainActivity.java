@@ -32,7 +32,9 @@ public class MainActivity extends Activity {
 		viewPager = (AutoSlideViewPager) findViewById(R.id.view_pager);
 		viewPager.setAdapter(new MyAdapter());
 		viewPager.setIntervalTime(3000);
-		viewPager.startSlide();
+		viewPager.setAutoScrollDurationFactor(8);
+		viewPager.setSwipeScrollDurationFactor(5);
+//		viewPager.startSlide();
 	}
 	
 	@Override
