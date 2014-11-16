@@ -265,7 +265,7 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 				changePointImageState(mAdapter.getPosition(mPreviousItem), false);
 			mPreviousItem = position;
 		}
-		if(isShowTitle && null != mAdapter.getPageTitle(position)) {
+		if(isShowTitle) {
 			setCurrentPageDescription(mAdapter.getPageTitle(position));
 		}
 	}
