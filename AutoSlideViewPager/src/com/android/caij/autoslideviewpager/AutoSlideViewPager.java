@@ -70,6 +70,11 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 	private double 			swipeScrollFactor = SCROOL_FACTOR;
 	private double 			autoScrollFactor = SCROOL_FACTOR;
 	
+	private RelativeLayout.LayoutParams mDescriptionTextViewParam;
+	private RelativeLayout.LayoutParams mPointLinearLayoutParam;
+	private LinearLayout.LayoutParams mPointImageLayoutParam;
+	private OnPageChangeListener pageChangeListener;
+	
 	public AutoSlideViewPager(Context context) {
 		super(context);
 		this.context = context;
@@ -99,12 +104,14 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		mViewPager.setAdapter(adapter);
 		if (isShowPoint) {
 			mPointLinearLayout.removeAllViews();
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-			params.setMargins(4, 4, 4, 4);
+			if(mPointImageLayoutParam == null) {
+				mPointImageLayoutParam = new LinearLayout.LayoutParams(
+						LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+				mPointImageLayoutParam.setMargins(4, 4, 4, 4);
+			}
 			for(int i = 0; i < adapter.getPageCount(); i++) {
 				ImageView pointImage = new ImageView(context);
-				pointImage.setLayoutParams(params);
+				pointImage.setLayoutParams(mPointImageLayoutParam);
 				pointImage.setBackgroundResource(mNormalPointImageResid);
 				mPointLinearLayout.addView(pointImage);
 			}
@@ -212,6 +219,30 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		this.isShowPoint = isShowPoint;
 	}
 	
+	public void setDescriptionTextViewParam(
+			RelativeLayout.LayoutParams mDescriptionTextViewParam) {
+		this.mDescriptionTextViewParam = mDescriptionTextViewParam;
+		mDescriptionTextView.setLayoutParams(this.mDescriptionTextViewParam);
+	}
+
+	public void setPointLinearLayoutParam(
+			RelativeLayout.LayoutParams mPointLinearLayoutParam) {
+		this.mPointLinearLayoutParam = mPointLinearLayoutParam;
+		mPointLinearLayout.setLayoutParams(this.mPointLinearLayoutParam);
+	}
+	
+	public void setPointImageLayoutParam(
+			LinearLayout.LayoutParams mPointImageLayoutParam) {
+		this.mPointImageLayoutParam = mPointImageLayoutParam;
+		for (int i = 0; i < mPointLinearLayout.getChildCount(); i++) {
+			mPointLinearLayout.getChildAt(i).setLayoutParams(this.mPointImageLayoutParam);;
+		}
+	}
+
+	/**
+	 * Whether the display title
+	 * @param isShowTitle
+	 */
 	public void setShowTitle(boolean isShowTitle) {
 		this.isShowTitle = isShowTitle;
 	}
@@ -240,6 +271,10 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
     	scroller.setScrollDurationFactor(scrollFactor);
         swipeScrollFactor = scrollFactor;
     }
+    
+    public void setOnPageChangeListener(OnPageChangeListener listener) {
+		this.pageChangeListener = listener;
+	}
 
     /**
      * set the factor by which the duration of sliding animation will change while auto scrolling
@@ -251,10 +286,16 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 
 	@Override
 	public void onPageScrollStateChanged(int state) {
+		if (pageChangeListener != null) {
+			pageChangeListener.onPageScrollStateChanged(state);
+		}
 	}
 
 	@Override
 	public void onPageScrolled(int i, float v, int j) {
+		if (pageChangeListener != null) {
+			pageChangeListener.onPageScrolled(i, v, j);;
+		}
 	}
 
 	@Override
@@ -267,6 +308,9 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		}
 		if(isShowTitle) {
 			setCurrentPageDescription(mAdapter.getPageTitle(position));
+		}
+		if(pageChangeListener != null) {
+			pageChangeListener.onPageSelected(position % mAdapter.getPageCount());
 		}
 	}
 	
@@ -290,4 +334,9 @@ public class AutoSlideViewPager extends RelativeLayout implements OnPageChangeLi
 		}
 	}
 
+	public interface OnPageChangeListener {
+		public void onPageScrollStateChanged(int state);
+		public void onPageScrolled(int i, float v, int j);
+		public void onPageSelected(int position);
+	}
 }

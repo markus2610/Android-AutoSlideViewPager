@@ -19,4 +19,11 @@ public interface IAutoSlideViewPagerAdapter {
 	 */
 	public View instantiatePageItem(int position);
 	
+	/**
+	 * Get description the title of the current page
+	 * @param position
+	 * @return
+	 */
+	public abstract CharSequence getCurrentPageTitle(int position);
+	
 }

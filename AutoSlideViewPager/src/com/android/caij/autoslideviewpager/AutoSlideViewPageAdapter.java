@@ -32,13 +32,6 @@ public abstract class AutoSlideViewPageAdapter extends PagerAdapter implements I
 		return position % getPageCount();
 	}
 
-	/**
-	 * Get description the title of the current page
-	 * @param position
-	 * @return
-	 */
-	public abstract CharSequence getCurrentPageTitle(int position);
-	
 	@Override
 	public Object instantiateItem(ViewGroup container, int position) {
 		position = position % getPageCount();
