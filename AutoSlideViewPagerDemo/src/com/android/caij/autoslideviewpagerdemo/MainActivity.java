@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.android.caij.autoslideviewpager.AutoSlideViewPageAdapter;
 import com.android.caij.autoslideviewpager.AutoSlideViewPager;
@@ -33,8 +35,27 @@ public class MainActivity extends Activity {
 		viewPager.setAdapter(new MyAdapter());
 		viewPager.setIntervalTime(3000);
 		viewPager.setAutoScrollDurationFactor(8);
-		viewPager.setSwipeScrollDurationFactor(5);
-//		viewPager.startSlide();
+		viewPager.setSwipeScrollDurationFactor(1);
+		
+//		RelativeLayout.LayoutParams param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+//				RelativeLayout.LayoutParams.WRAP_CONTENT);
+//		param.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+//		param.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//		param.bottomMargin = 20;
+//		viewPager.setPointLinearLayoutParam(param);
+		
+//		param = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,
+//				RelativeLayout.LayoutParams.WRAP_CONTENT);
+//		param.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+//		param.addRule(RelativeLayout.LEFT_OF, R.id.item_llayout_point);
+//		param.bottomMargin = 20;
+//		param.rightMargin = 20;
+//		viewPager.setDescriptionTextViewParam(param);
+		
+//		LinearLayout.LayoutParams mPointImageLayoutParam = new LinearLayout.LayoutParams(
+//				LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+//		mPointImageLayoutParam.setMargins(10, 10, 10, 10);
+//		viewPager.setPointImageLayoutParam(mPointImageLayoutParam);
 	}
 	
 	@Override
